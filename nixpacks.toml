@@ -1,2 +1,11 @@
 [phases.setup]
 nixPkgs = ["ffmpeg_7-full"]
+
+[phases.install]
+command = "pip install -r requirements.txt"
+
+[phases.build]
+command = "echo 'Building the app...'"
+
+[phases.start]
+command = "python3 create-mp3.py"
