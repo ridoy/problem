@@ -44,7 +44,7 @@ def load_sections():
             # Get the file mode (permissions)
             permissions = stat.filemode(file_stat.st_mode)
             print(f"File permissions for {section_path}: {permissions}")
-            sections.append(AudioSegment.from_mp3(section_path))
+            sections.append(AudioSegment.from_file(section_path, "mp3"))
         else:
             print(f"Section not found: {section_path}")
     return sections
