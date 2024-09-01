@@ -5,6 +5,7 @@ import io
 import boto3
 import uuid
 from botocore.exceptions import NoCredentialsError
+import stat
 
 app = Flask(__name__)
 
@@ -27,11 +28,16 @@ section_filenames = [
     "rob49.mp3"
 ]
 def load_sections():
-    directory = "./sections"
+    directory = "sections"
     sections = []
     for filename in section_filenames:
-        section_path = os.path.join(directory, filename)
+        section_path = os.path.join(os.getcwd(), directory, filename)
+        print(section_path)
         if os.path.exists(section_path):
+            file_stat = os.stat(section_path)
+            # Get the file mode (permissions)
+            permissions = stat.filemode(file_stat.st_mode)
+            print(f"File permissions for {section_path}: {permissions}")
             sections.append(AudioSegment.from_mp3(section_path))
         else:
             print(f"Section not found: {section_path}")
@@ -99,6 +105,5 @@ def index():
 
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
