@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, render_template
 from pydub import AudioSegment
 import os
 import io
 import boto3
+import uuid
 from botocore.exceptions import NoCredentialsError
 
 app = Flask(__name__)
@@ -36,6 +37,8 @@ def load_sections():
     return sections
 
 def stitch_sections(sections, order):
+    # TODO make out dir if doesn't exist
+    # TODO add intro.mp3
     ordered_sections = []
     for index in order:
         if 1 <= index <= len(sections):
@@ -55,17 +58,16 @@ def stitch_sections(sections, order):
     
     print(f"Final combined length: {len(combined) / 1000} seconds")
 
-    combined.export("./out/output.mp3", format="mp3", bitrate="320k")
-    url = upload_to_s3("out/output.mp3", "problem-customized")
+    unique_filename = str(uuid.uuid4()) + ".mp3"
+    combined.export("./out/" + unique_filename, format="mp3", bitrate="320k")
+    # TODO: should be uuid/problem feat (verses user selected).mp3
+    url = upload_to_s3("./out/" + unique_filename, "problem-customized", unique_filename)
     print(url)
-    return combined, None
+    return url, None
 
 
-def upload_to_s3(file_name, bucket, object_name=None):
+def upload_to_s3(file_name, bucket, object_name):
     s3_client = boto3.client('s3')
-    if object_name is None:
-        object_name = file_name
-
     try:
         s3_client.upload_file(file_name, bucket, object_name)
         return f"https://{bucket}.s3.amazonaws.com/{object_name}"
@@ -74,27 +76,27 @@ def upload_to_s3(file_name, bucket, object_name=None):
         return None
 
 
-# @app.route('/stitch', methods=['POST'])
+@app.route('/stitch', methods=['POST'])
 def stitch():
-    # data = request.json
-    # order = data.get("order")
+    data = request.json
+    order = data.get("order")
 
     sections = load_sections()
     if not sections:
         return jsonify({"error": "No sections were loaded."}), 400
 
-    combined, error = stitch_sections(sections, [1,1,1,1])
+    url, error = stitch_sections(sections, order)
     if error:
         return jsonify({"error": error}), 400
 
-    # # Export to an in-memory file
-    # mp3_io = io.BytesIO()
-    # combined.export(mp3_io, format="mp3")
-    # mp3_io.seek(0)
+    return jsonify({"generated_url": url})
 
-    # return send_file(mp3_io, mimetype="audio/mpeg", as_attachment=True, download_name="stitched_output.mp3")
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 
 if __name__ == "__main__":
-    stitch()
-    # app.run(debug=True)
+    app.run(debug=True)
 

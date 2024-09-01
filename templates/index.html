@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Processor</title>
+</head>
+<body>
+    <h1>Order Processor</h1>
+    <label for="orderInput">Enter a comma-separated list of integers:</label><br>
+    <input type="text" id="orderInput" name="orderInput" placeholder="e.g., 1, 2, 3"><br><br>
+    <button onclick="sendOrder()">Submit Order</button>
+
+    <h2>Server Response:</h2>
+    <p id="response"></p>
+    <script>
+        function sendOrder() {
+            const input = document.getElementById('orderInput').value;
+            const orderArray = input.split(',').map(num => parseInt(num.trim()));
+            const payload = { order: orderArray };
+            
+            // Send the payload to the server
+            fetch('http://127.0.0.1:5000/stitch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display the server response on the page
+                document.getElementById('response').innerText = data.generated_url;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+
+</html>
