@@ -29,6 +29,12 @@ section_filenames = [
 ]
 def load_sections():
     directory = "sections"
+    section_path = os.path.join(os.getcwd(), directory)
+    file_stat = os.stat(section_path)
+    # Get the file mode (permissions)
+    permissions = stat.filemode(file_stat.st_mode)
+    print(f"File permissions for {section_path}: {permissions}")
+
     sections = []
     for filename in section_filenames:
         section_path = os.path.join(os.getcwd(), directory, filename)
