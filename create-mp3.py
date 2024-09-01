@@ -8,6 +8,12 @@ from botocore.exceptions import NoCredentialsError
 import stat
 
 app = Flask(__name__)
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
+)
+
 
 section_filenames = [
     "intro.mp3",
@@ -76,8 +82,6 @@ def stitch_sections(sections, order):
 
 
 def upload_to_s3(file_name, bucket, object_name):
-    # TODO: init globally
-    s3_client = boto3.client('s3')
     try:
         s3_client.upload_file(file_name, bucket, object_name)
         return f"https://{bucket}.s3.amazonaws.com/{object_name}"
