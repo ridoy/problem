@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, send_file
 from pydub import AudioSegment
 import os
 import io
+import boto3
+from botocore.exceptions import NoCredentialsError
 
 app = Flask(__name__)
 
@@ -50,27 +52,46 @@ def stitch_sections(sections, order):
     for section in ordered_sections[1:]:
         combined += section
 
+    combined.export("./out/output.mp3", format="mp3")
+    url = upload_to_s3("out/output.mp3", "problem-customized")
+    print(url)
     return combined, None
 
-@app.route('/stitch', methods=['POST'])
-def stitch():
-    data = request.json
-    order = data.get("order")
 
-    sections = load_sections(directory)
+def upload_to_s3(file_name, bucket, object_name=None):
+    s3_client = boto3.client('s3')
+    if object_name is None:
+        object_name = file_name
+
+    try:
+        s3_client.upload_file(file_name, bucket, object_name)
+        return f"https://{bucket}.s3.amazonaws.com/{object_name}"
+    except NoCredentialsError:
+        print("Credentials not available.")
+        return None
+
+
+# @app.route('/stitch', methods=['POST'])
+def stitch():
+    # data = request.json
+    # order = data.get("order")
+
+    sections = load_sections()
     if not sections:
         return jsonify({"error": "No sections were loaded."}), 400
 
-    combined, error = stitch_sections(sections, order)
+    combined, error = stitch_sections(sections, [1,1,1,1])
     if error:
         return jsonify({"error": error}), 400
 
-    # Export to an in-memory file
-    mp3_io = io.BytesIO()
-    combined.export(mp3_io, format="mp3")
-    mp3_io.seek(0)
+    # # Export to an in-memory file
+    # mp3_io = io.BytesIO()
+    # combined.export(mp3_io, format="mp3")
+    # mp3_io.seek(0)
 
-    return send_file(mp3_io, mimetype="audio/mpeg", as_attachment=True, download_name="stitched_output.mp3")
+    # return send_file(mp3_io, mimetype="audio/mpeg", as_attachment=True, download_name="stitched_output.mp3")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    stitch()
+    # app.run(debug=True)
+

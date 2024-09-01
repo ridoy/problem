@@ -2,4 +2,5 @@ out/
 venv/
 
 .DS_Store
+.env
 
