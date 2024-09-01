@@ -1,42 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Processor</title>
-</head>
-<body>
-    <h1>Order Processor</h1>
-    <label for="orderInput">Enter a comma-separated list of integers:</label><br>
-    <input type="text" id="orderInput" name="orderInput" placeholder="e.g., 1, 2, 3"><br><br>
-    <button onclick="sendOrder()">Submit Order</button>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PROBLEM CUSTOMIZER</title>
+        <link href="https://fonts.cdnfonts.com/css/helvetica-neue-55" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+        <style>
+            body {
+                font-family: "Helvetica Neue", sans-serif;
+            }
+            .draggable-item {
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>LOREM IPSUM</h1>
+        <ul id="sortableList" class="draggable-list">
+            <li class="draggable-item" data-id="1">
+                <input type="checkbox" checked> CASH COBAIN
+            </li>
+            <li class="draggable-item" data-id="2">
+                <input type="checkbox" checked> FABOLOUS
+            </li>
+            <li class="draggable-item" data-id="3">
+                <input type="checkbox" checked> KENZO B
+            </li>
+            <li class="draggable-item" data-id="4">
+                <input type="checkbox" checked> BIG SEAN
+            </li>
+            <li class="draggable-item" data-id="5">
+                <input type="checkbox" checked> LAY BANKZ
+            </li>
+            <li class="draggable-item" data-id="6">
+                <input type="checkbox" checked> LUH TYLER
+            </li>
+            <li class="draggable-item" data-id="7">
+                <input type="checkbox" checked> ANYCIA
+            </li>
+            <li class="draggable-item" data-id="8">
+                <input type="checkbox" checked> CHOW LEE
+            </li>
+            <li class="draggable-item" data-id="9">
+                <input type="checkbox" checked> KALIII
+            </li>
+            <li class="draggable-item" data-id="10">
+                <input type="checkbox" checked> 6LACK
+            </li>
+            <li class="draggable-item" data-id="11">
+                <input type="checkbox" checked> FLO MILLI
+            </li>
+            <li class="draggable-item" data-id="12">
+                <input type="checkbox" checked> YN JAY
+            </li>
+            <li class="draggable-item" data-id="13">
+                <input type="checkbox" checked> FLEE
+            </li>
+            <li class="draggable-item" data-id="14">
+                <input type="checkbox" checked> DON Q
+            </li>
+            <li class="draggable-item" data-id="15">
+                <input type="checkbox" checked> ROB49
+            </li>
+        </ul><br><br>
+        <button onclick="generateMP3()">GENERATE</button>
 
-    <h2>Server Response:</h2>
-    <p id="response"></p>
-    <script>
-        function sendOrder() {
-            const input = document.getElementById('orderInput').value;
-            const orderArray = input.split(',').map(num => parseInt(num.trim()));
-            const payload = { order: orderArray };
-            
-            // Send the payload to the server
-            fetch('http://127.0.0.1:5000/stitch', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Display the server response on the page
-                document.getElementById('response').innerText = data.generated_url;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
+        <p id="response">YOUR GENERATED MP3 WILL APPEAR HERE</p>
+        <script>
+            const sortable = new Sortable(document.getElementById('sortableList'), {
+                animation: 150
             });
-        }
-    </script>
-</body>
-
+            function generateMP3() {
+                const verses = document.querySelectorAll(".draggable-item");
+                const versesToInclude = [];
+                verses.forEach(verse => {
+                    if (verse.querySelector('input[type="checkbox"]').checked) {
+                        versesToInclude.push(parseInt(verse.getAttribute("data-id")));
+                    }
+                })
+                console.log(verses);
+                console.log(versesToInclude);
+                const payload = { order: versesToInclude };
+                const responseElement = document.getElementById('response');
+                responseElement.innerText = "GENERATING...";
+                fetch('http://127.0.0.1:5000/stitch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = data.generated_url;
+                    downloadLink.innerText = "DOWNLOAD YOUR CUSTOMIZED MP3 HERE";
+                    downloadLink.setAttribute('target', '_blank');
+                    responseElement.innerHTML = '';
+                    responseElement.appendChild(downloadLink);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }
+        </script>
+    </body>
 </html>
