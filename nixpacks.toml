@@ -1,2 +1,2 @@
 [phases.setup]
-nixPkgs = ["...", "ffmpeg_7-full"]
+nixPkgs = ["ffmpeg_7-full"]
