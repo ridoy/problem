@@ -12,6 +12,22 @@
             }
             .draggable-item {
                 cursor: pointer;
+                display: block;
+                border: 1px solid black;
+                width: 150px;
+                padding: 5px;
+                border-radius: 10px;
+                margin-bottom: 5px;
+                cursor: move; /* fallback if grab cursor is unsupported */
+                cursor: grab;
+                cursor: -moz-grab;
+                cursor: -webkit-grab;
+            }
+
+            .draggable-item:active {
+                cursor: grabbing;
+                cursor: -moz-grabbing;
+                cursor: -webkit-grabbing;
             }
         </style>
     </head>
