@@ -7,6 +7,9 @@ import uuid
 from botocore.exceptions import NoCredentialsError
 import stat
 
+print("AWS_ACCESS_KEY_ID:", os.getenv("AWS_ACCESS_KEY_ID"))
+print("AWS_SECRET_ACCESS_KEY:", os.getenv("AWS_SECRET_ACCESS_KEY"))
+print("AWS_REGION:", os.getenv("AWS_REGION"))
 app = Flask(__name__)
 s3_client = boto3.client(
     's3',
