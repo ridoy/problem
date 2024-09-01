@@ -51,8 +51,11 @@ def stitch_sections(sections, order):
     combined = ordered_sections[0]
     for section in ordered_sections[1:]:
         combined += section
+        print(f"Current combined length: {len(combined) / 1000} seconds")
+    
+    print(f"Final combined length: {len(combined) / 1000} seconds")
 
-    combined.export("./out/output.mp3", format="mp3")
+    combined.export("./out/output.mp3", format="mp3", bitrate="320k")
     url = upload_to_s3("out/output.mp3", "problem-customized")
     print(url)
     return combined, None
