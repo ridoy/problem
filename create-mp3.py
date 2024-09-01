@@ -8,7 +8,8 @@ from botocore.exceptions import NoCredentialsError
 
 app = Flask(__name__)
 
-verse_filenames = [
+section_filenames = [
+    "intro.mp3",
     "cash.mp3",
     "fab.mp3",
     "kenzob.mp3",
@@ -26,9 +27,9 @@ verse_filenames = [
     "rob49.mp3"
 ]
 def load_sections():
-    directory = "./verses"
+    directory = "./sections"
     sections = []
-    for filename in verse_filenames:
+    for filename in section_filenames:
         section_path = os.path.join(directory, filename)
         if os.path.exists(section_path):
             sections.append(AudioSegment.from_mp3(section_path))
@@ -37,18 +38,16 @@ def load_sections():
     return sections
 
 def stitch_sections(sections, order):
-    # TODO make out dir if doesn't exist
-    # TODO add intro.mp3
-    ordered_sections = []
+    ordered_sections = [sections[0]] # always start with intro.mp3
     for index in order:
         if 1 <= index <= len(sections):
-            ordered_sections.append(sections[index - 1])
+            ordered_sections.append(sections[index])
         else:
-            # TODO this should never happen, just throw an error
+            # TODO: this should never happen, just throw an error
             return None, f"Invalid section number: {index}"
 
     if not ordered_sections:
-        # TODO same here. Error out
+        # TODO: same here. Error out
         return None, "No sections selected."
 
     combined = ordered_sections[0]
@@ -58,15 +57,14 @@ def stitch_sections(sections, order):
     
     print(f"Final combined length: {len(combined) / 1000} seconds")
 
-    unique_filename = str(uuid.uuid4()) + ".mp3"
-    combined.export("./out/" + unique_filename, format="mp3", bitrate="320k")
-    # TODO: should be uuid/problem feat (verses user selected).mp3
-    url = upload_to_s3("./out/" + unique_filename, "problem-customized", unique_filename)
-    print(url)
+    unique_id = str(uuid.uuid4())
+    combined.export("./out/{}.mp3".format(unique_id), format="mp3", bitrate="320k")
+    url = upload_to_s3("./out/{}.mp3".format(unique_id), "problem-customized", "{}/problem.mp3".format(unique_id))
     return url, None
 
 
 def upload_to_s3(file_name, bucket, object_name):
+    # TODO: init globally
     s3_client = boto3.client('s3')
     try:
         s3_client.upload_file(file_name, bucket, object_name)
@@ -81,10 +79,12 @@ def stitch():
     data = request.json
     order = data.get("order")
 
+    # TODO: init globally
     sections = load_sections()
     if not sections:
         return jsonify({"error": "No sections were loaded."}), 400
 
+    # TODO: formalize error rerrsponse
     url, error = stitch_sections(sections, order)
     if error:
         return jsonify({"error": error}), 400
