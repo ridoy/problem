@@ -94,6 +94,7 @@ def stitch():
 
 @app.route('/')
 def index():
+    print("hey")
     return render_template('index.html')
 
 
