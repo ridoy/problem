@@ -67,14 +67,13 @@ def generate_ffmpeg_command(acapella_indices, acapella_paths, output_file_path):
     delays = [start_of_first_verse_ms + (eight_bars_ms * i) for i in range(len(acapella_indices))]  # Example delays; adjust as needed
     for i, acapella in enumerate(selected_acapellas):
         delay = delays[i]
-        acapella_filter = f"[{i+1}]adelay={delay}|{delay},volume=0.8[a{i+1}]"
+        acapella_filter = f"[{i+1}]adelay={delay}|{delay}[a{i+1}]"
         acapella_filters.append(acapella_filter)
 
     # Construct the final filter complex
     filter_complex.extend(acapella_filters)
-    filter_complex.append(f"[0]volume=0.8[bg]")
-    mix_inputs = '[bg]' + ''.join([f"[a{i+1}]" for i in range(len(selected_acapellas))])
-    filter_complex.append(f"{mix_inputs}amix=inputs={len(selected_acapellas)+1}:duration=longest[mix]")
+    mix_inputs = '[0]' + ''.join([f"[a{i+1}]" for i in range(len(selected_acapellas))])
+    filter_complex.append(f"{mix_inputs}amix=inputs={len(selected_acapellas)+1}:duration=longest:normalize=0[mix]")
 
     # Combine the filter complex into a single argument
     filter_complex_str = '; '.join(filter_complex)
