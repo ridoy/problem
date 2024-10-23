@@ -97,7 +97,7 @@ def run_command(command):
     """
     try:
         # Execute the command
-        process = subprocess.run(command, shell=True, check=True)
+        process = subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if process.returncode == 0:
             print("Command executed successfully!")
         else:
