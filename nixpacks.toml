@@ -8,4 +8,4 @@ command = "pip install -r requirements.txt"
 command = "echo 'Building the app...'"
 
 [phases.start]
-command = "python3 create-mp3.py"
+command = "gunicorn --bind 0.0.0.0:5000 create-mp3:app"
