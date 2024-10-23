@@ -122,7 +122,7 @@ def stitch():
     # TODO: handle error
     url = upload_to_s3(output_file_path, "problem-customized", "{}/problem.mp3".format(unique_id))
 
-    # # TODO: formalize error rerrsponse
+    # # TODO: formalize error response
     # if error:
     #     return jsonify({"error": error}), 400
 

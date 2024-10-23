@@ -3,18 +3,33 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PROBLEM CUSTOMIZER</title>
+        <title>PROBLEM SOLVER</title>
         <link href="https://fonts.cdnfonts.com/css/helvetica-neue-55" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
         <style>
             body {
                 font-family: "Helvetica Neue", sans-serif;
+                background: #3aff16;
+                padding: 30px;
+                margin: 0;
+            }
+
+            h1 {
+                margin-top: 0;
+            }
+            
+            .instruction {
+                font-size: 14px;
+                margin-bottom: 7px;
+                margin-top: 7px;
+            }
+            .draggable-list {
+                padding-left: 0px;
             }
             .draggable-item {
-                cursor: pointer;
                 display: block;
                 border: 1px solid black;
-                width: 150px;
+                width: 175px;
                 padding: 5px;
                 border-radius: 10px;
                 margin-bottom: 5px;
@@ -23,22 +38,41 @@
                 cursor: -moz-grab;
                 cursor: -webkit-grab;
             }
-
             .draggable-item:active {
                 cursor: grabbing;
                 cursor: -moz-grabbing;
                 cursor: -webkit-grabbing;
             }
+            #generate-button {
+                cursor: pointer;
+                border: 2px solid black;
+                font-size: 16px;
+                background: black;
+                color: #3aff16;
+                font-family: "Helvetica Neue";
+                padding: 10px;
+                width: 187px;
+                border-radius: 10px;
+            }
+            #generate-button:hover {
+                background: #3aff16;
+                color: black;
+            }
         </style>
     </head>
     <body>
-        <h1>PROBLEM CUSTOMIZER</h1>
+        <h1>PROBLEM SOLVER</h1>
+        <div class="instructions">
+            <p class="instruction">ARRANGE VERSES IN YOUR PREFERRED ORDER BY DRAGGING.</p>
+            <p class="instruction">USE CHECKBOXES TO INCLUDE OR EXCLUDE VERSES.</p>
+            <p class="instruction">CLICK GENERATE.</p>
+        </div>
         <ul id="sortableList" class="draggable-list">
             <li class="draggable-item" data-id="0">
                 <input type="checkbox" checked> CASH COBAIN
             </li>
             <li class="draggable-item" data-id="1">
-                <input type="checkbox" checked> KYLE RICH
+                <input type="checkbox" checked> KYLE RICCH
             </li>
             <li class="draggable-item" data-id="2">
                 <input type="checkbox" checked> KENZO B
@@ -64,10 +98,11 @@
             <li class="draggable-item" data-id="9">
                 <input type="checkbox" checked> 6LACK
             </li>
-        </ul><br><br>
-        <button onclick="generateMP3()">GENERATE</button>
+        </ul><br>
+        <button id="generate-button" onclick="generateMP3()">GENERATE</button>
 
         <p id="response">YOUR GENERATED MP3 WILL APPEAR HERE</p>
+        <img src="artwork_500x500.png">
         <script>
             const sortable = new Sortable(document.getElementById('sortableList'), {
                 animation: 150
