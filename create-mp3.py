@@ -29,6 +29,19 @@ acapella_paths = [
     "acapellas/6lack.wav"
 ]
 
+index_to_artist = [
+    "Cash Cobain",
+    "Kyle Ricch",
+    "Kenzo B",
+    "Lil Yachty",
+    "Lay Bankz",
+    "Big Sean",
+    "Fabolous",
+    "Anycia",
+    "Chow Lee",
+    "6LACK"
+]
+
 def upload_to_s3(file_name, bucket, object_name):
     try:
         s3_client.upload_file(file_name, bucket, object_name)
@@ -42,6 +55,11 @@ def get_beat_file(index):
     if index > 10 or index < 1:
         raise ValueError("Invalid beat index")
     return f"beats/full_beat_{index}.mp3"
+
+
+def print_artist_names(indices):
+    artists = [index_to_artist[idx] for idx in indices]
+    print(f"Handling request for artists: {", ".join(artists)}")
 
 
 def generate_ffmpeg_command(acapella_indices, acapella_paths, output_file_path):
@@ -110,6 +128,8 @@ def run_command(command):
 def stitch():
     data = request.json
     acapella_indices = data.get("order")
+
+    print_artist_names(acapella_indices)
 
     unique_id = str(uuid.uuid4())
     output_file_path = f"out/{unique_id}.mp3"
