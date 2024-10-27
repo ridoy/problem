@@ -8,6 +8,9 @@ from botocore.exceptions import NoCredentialsError
 import stat
 from pathlib import Path
 import subprocess
+import csv
+from io import StringIO
+
 
 app = Flask(__name__)
 s3_client = boto3.client(
@@ -15,6 +18,7 @@ s3_client = boto3.client(
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
 )
+dynamo_client = boto3.client('dynamodb', region_name='us-west-2')
 
 acapella_paths = [
     "acapellas/cash.wav",
@@ -107,12 +111,6 @@ def generate_ffmpeg_command(acapella_indices, acapella_paths, output_file_path):
 
 
 def run_command(command):
-    """
-    Execute the given command using subprocess.
-
-    Parameters:
-    - command (str): The command to execute.
-    """
     try:
         # Execute the command
         process = subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -148,6 +146,21 @@ def stitch():
 
     if url:
         return jsonify({"generated_url": url})
+
+
+@app.route('/email', methods=['POST'])
+def save_email():
+    data = request.json
+    email = data.get("email")
+    print(f"Saving email {email}")
+
+    try:
+        dynamo_client.put_item(TableName="problem-emails", Item={"emailPK": {"S": email}})
+    except Exception as e:
+        print("Error saving to DynamoDB")
+        print(e)
+        pass
+    return jsonify({})
 
 
 @app.route('/')
