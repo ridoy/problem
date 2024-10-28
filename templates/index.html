@@ -163,6 +163,9 @@
                         versesToInclude.push(parseInt(verse.getAttribute("data-id")));
                     }
                 })
+                if (versesToInclude.length === 0) {
+                    return;
+                }
                 const payload = { order: versesToInclude };
                 const responseElement = document.getElementById('response');
                 responseElement.innerText = "GENERATING...";
