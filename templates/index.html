@@ -195,6 +195,9 @@
             }
             function sendEmail() {
                 const email = document.getElementById("email-input").value;
+                if (email === "") {
+                    return;
+                }
                 const payload = {
                     "email": email
                 }
