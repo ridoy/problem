@@ -5,94 +5,16 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>PROBLEM SOLVER</title>
         <link href="https://fonts.cdnfonts.com/css/helvetica-neue-55" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-PVM7R32L2S"></script>
         <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
 
-        gtag('config', 'G-PVM7R32L2S');
+			gtag('config', 'G-PVM7R32L2S');
         </script>
-        <style>
-            body {
-                font-family: "Helvetica Neue", sans-serif;
-                background: #3aff16;
-                padding: 30px;
-                margin: 0;
-            }
-
-            h1 {
-                margin-top: 0;
-            }
-            
-            .instruction {
-                font-size: 14px;
-                margin-bottom: 7px;
-                margin-top: 7px;
-            }
-            .draggable-list {
-                padding-left: 0px;
-            }
-            .draggable-item {
-                display: block;
-                border: 1px solid black;
-                width: 250px;
-                padding: 5px;
-                border-radius: 10px;
-                margin-bottom: 5px;
-                cursor: move; /* fallback if grab cursor is unsupported */
-                cursor: grab;
-                cursor: -moz-grab;
-                cursor: -webkit-grab;
-            }
-            .draggable-item:active {
-                cursor: grabbing;
-                cursor: -moz-grabbing;
-                cursor: -webkit-grabbing;
-            }
-            button {
-                cursor: pointer;
-                border: 2px solid black;
-                font-size: 16px;
-                background: black;
-                color: #3aff16;
-                font-family: "Helvetica Neue";
-                padding: 10px;
-                width: 262px;
-                border-radius: 10px;
-                display: block;
-                margin-bottom: 10px;
-            }
-
-            button:hover {
-                background: #3aff16;
-                color: black;
-            }
-            img {
-                width: calc(100% - 60px);
-                max-width: 500px;
-                height: auto;
-                box-sizing: border-box;
-                margin-top: 10px;
-            }
-            #email-input {
-                font-family: "Helvetica Neue";
-                font-size: 16px;
-                border: 1px solid black;
-                border-radius: 10px;
-                padding: 5px;
-                width: 250px;
-                margin-bottom: 10px;
-            }
-            input:focus {
-                outline-width: 0;
-            }
-            #email-submit-button:hover {
-                background: #3aff16;
-                color: black;
-            }
-        </style>
     </head>
     <body>
         <h1>PROBLEM SOLVER</h1>
@@ -137,96 +59,7 @@
 
         <div id="response">YOUR GENERATED MP3 WILL APPEAR HERE</div>
         <img src="https://problem-customized.s3.us-west-2.amazonaws.com/artwork_500x500.png">
-        <script>
-            const sortable = new Sortable(document.getElementById('sortableList'), {
-                animation: 150
-            });
-            let generatedUrl;
-            function removeEmailInput() {
-                if (document.getElementById("email-input")) {
-                    document.getElementById("email-input").remove();
-                }
-                if (document.getElementById("email-submit-button")) {
-                    document.getElementById("email-submit-button").remove();
-                }
-            }
-            function removeGenerateButton() {
-                if (document.getElementById("generate-button")) {
-                    document.getElementById("generate-button").remove();
-                }
-            }
-            function generateMP3() {
-                const verses = document.querySelectorAll(".draggable-item");
-                const versesToInclude = [];
-                verses.forEach(verse => {
-                    if (verse.querySelector('input[type="checkbox"]').checked) {
-                        versesToInclude.push(parseInt(verse.getAttribute("data-id")));
-                    }
-                })
-                if (versesToInclude.length === 0) {
-                    return;
-                }
-                const payload = { order: versesToInclude };
-                const responseElement = document.getElementById('response');
-                responseElement.innerText = "GENERATING...";
-                removeEmailInput();
-                removeGenerateButton();
-                fetch('/stitch', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    generatedUrl = data.generated_url;
-                    const emailInput = document.createElement('input');
-                    emailInput.setAttribute("id", "email-input");
-                    emailInput.placeholder = "ENTER EMAIL HERE";
-                    const emailSubmit = document.createElement('button');
-                    emailSubmit.id = "email-submit-button";
-                    emailSubmit.innerText = "SUBMIT";
-                    emailSubmit.onclick = sendEmail;
-                    responseElement.innerHTML = '';
-                    responseElement.appendChild(emailInput);
-                    responseElement.appendChild(emailSubmit);
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
-            }
-            function sendEmail() {
-                const email = document.getElementById("email-input").value;
-                if (email === "") {
-                    return;
-                }
-                const payload = {
-                    "email": email
-                }
-                const responseElement = document.getElementById('response');
-                responseElement.innerHTML = 'JUST A SECOND...';
-                fetch('/email', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    const downloadLink = document.createElement('a');
-                    removeEmailInput();
-                    downloadLink.href = generatedUrl;
-                    downloadLink.innerText = "PLAY YOUR CUSTOMIZED MP3 HERE";
-                    downloadLink.setAttribute('target', '_blank');
-                    responseElement.innerHTML = '';
-                    responseElement.appendChild(downloadLink);
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                }); 
-            }
+        <script src="{{ url_for('static', filename='js/main.js') }}">
         </script>
     </body>
 </html>
